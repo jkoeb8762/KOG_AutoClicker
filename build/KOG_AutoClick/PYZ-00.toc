@@ -1,4 +1,4 @@
-('C:\\Users\\TitanX\\Desktop\\Portfolio\\FORFUN\\KOG_AutoCliker\\build\\KOG_AutoClick\\PYZ-00.pyz',
+('C:\\Users\\TitanX\\Desktop\\Portfolio\\FORFUN\\KOG_AutoClicker\\build\\KOG_AutoClick\\PYZ-00.pyz',
  [('PIL', 'C:\\Python312\\Lib\\site-packages\\PIL\\__init__.py', 'PYMODULE'),
   ('PIL.BlpImagePlugin',
    'C:\\Python312\\Lib\\site-packages\\PIL\\BlpImagePlugin.py',
