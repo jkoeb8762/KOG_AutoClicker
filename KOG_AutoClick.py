@@ -36,6 +36,8 @@ def click_pixel(image):
     global confidence
     try:
         buttonx, buttony = locate_center_on_screen(image)
+        if buttonx is None or buttony is None:
+            raise pyautogui.ImageNotFoundException(f"Image {image} not found.")
         pyautogui.click(buttonx, buttony)
         return True
     except pyautogui.ImageNotFoundException as e:
@@ -48,6 +50,8 @@ def locate_and_move(image):
     global confidence
     try:
         x, y = locate_center_on_screen(image)
+        if x is None:
+            raise pyautogui.ImageNotFoundException(f"Image {image} not found.")
         pyautogui.moveTo(x, y)
         return x, y
     except pyautogui.ImageNotFoundException as e:
@@ -79,6 +83,7 @@ def save_config(data):
         json.dump(data, f, indent=4)
     
 def setup():
+    global confidence
     # Prompt user for target type
     print("手動自己點幾次 先把各種提示關閉")
     checker = input("增加到想要的屬性後停止 先不要選擇保留或使用原值 輸入y進入下一步").strip().lower()
@@ -91,7 +96,7 @@ def setup():
 
     if target_type not in {'str', 'int', 'dex'}:
         print("非法選項. 退出中.")
-        return
+        return None
     print("警告: 每次育成耗時約3秒。程式運行期間會無法使用電腦。")
     print("若中途要終止需與腳本爭奪鼠標控制權")
     print("少迴優化不佳長期運行 模擬器容易卡頓崩潰 建議輸入1000以下的數字")
