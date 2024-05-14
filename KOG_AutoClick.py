@@ -143,7 +143,7 @@ def auto_click():
         for i in range(int(data['target_cycles'])):
             time.sleep(1)
             # Click the 10x.png image until it is no longer visible
-            while locate_center_on_screen('resources/10x.png') is not None:
+            while locate_center_on_screen('resources/10x.png'):
                 click_pixel('resources/10x.png')
                 time.sleep(0.5)
 
