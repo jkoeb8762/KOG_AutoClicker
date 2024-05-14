@@ -1,5 +1,5 @@
 {
-    "target_cycles": 5,
+    "target_cycles": 10,
     "target_location": {
         "x": 106,
         "y": 385
