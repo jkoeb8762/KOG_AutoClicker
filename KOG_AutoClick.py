@@ -3,29 +3,70 @@ from PIL import ImageGrab
 import json
 import time
 import os
+import re
+import pyscreeze
+
+confidence = 0.8
 
 def get_pixel_color(x, y):
     """Get the color of the pixel at the specified coordinates."""
     screen = ImageGrab.grab()
     return screen.getpixel((x, y))
 
+# def click_pixel(image):
+#     """Find and click the center of an image on the screen."""
+#     try:
+#         buttonx, buttony = pyautogui.locateCenterOnScreen(image, confidence=0.9)
+#         pyautogui.click(buttonx, buttony)
+#         return True
+#     except pyautogui.ImageNotFoundException:
+#         print(f'ImageNotFoundException: {image} not found')
+#         return False
+
+# def locate_and_move(image):
+#     """Find and move to the center of an image on the screen."""
+#     x, y = pyautogui.locateCenterOnScreen(image, confidence=0.9)
+#     if x is None:
+#         raise ValueError(f"{image} not found on screen")
+#     pyautogui.moveTo(x, y)
+#     return x, y
+
 def click_pixel(image):
-    """Find and click the center of an image on the screen."""
+    """Find and click the center of an image on the screen with global confidence level."""
+    global confidence
     try:
-        buttonx, buttony = pyautogui.locateCenterOnScreen(image, confidence=0.6)
+        buttonx, buttony = locate_center_on_screen(image)
         pyautogui.click(buttonx, buttony)
         return True
-    except pyautogui.ImageNotFoundException:
-        print(f'ImageNotFoundException: {image} not found')
+    except pyautogui.ImageNotFoundException as e:
+        highest_confidence = get_highest_confidence_from_exception(str(e))
+        print(f'ImageNotFoundException: {image} not found at confidence level {confidence}. Highest confidence detected: {highest_confidence}')
         return False
 
-def locate_and_move(image, confidence=0.8):
-    """Find and move to the center of an image on the screen."""
-    x, y = pyautogui.locateCenterOnScreen(image, confidence=confidence)
-    if x is None:
-        raise ValueError(f"{image} not found on screen")
-    pyautogui.moveTo(x, y)
-    return x, y
+def locate_and_move(image):
+    """Find and move to the center of an image on the screen with global confidence level."""
+    global confidence
+    try:
+        x, y = locate_center_on_screen(image)
+        pyautogui.moveTo(x, y)
+        return x, y
+    except pyautogui.ImageNotFoundException as e:
+        highest_confidence = get_highest_confidence_from_exception(str(e))
+        print(f"ImageNotFoundException: {image} not found at confidence level {confidence}. Highest confidence detected: {highest_confidence}")
+        return None
+
+def locate_center_on_screen(image):
+    """Wrapper function to handle image location and extract confidence from exception."""
+    global confidence
+    try:
+        return pyautogui.locateCenterOnScreen(image, confidence=confidence)
+    except pyautogui.ImageNotFoundException:
+        return None
+
+def get_highest_confidence_from_exception(exception_message):
+    """Extract the highest confidence level from the exception message."""
+    match = re.search(r'highest confidence = ([\d.]+)', exception_message)
+    return float(match.group(1)) if match else None
 
 def load_config():
     if os.path.exists('config.json'):
@@ -62,7 +103,8 @@ def setup():
     #try:
     # Locate the center of the target image
     target_x, target_y = locate_and_move(target_image)
-
+    if target_x is None or target_y is None:
+        return None
     # Locate the center of the fail image
     resultarrow_x, resultarrow_y = locate_and_move(success_image)
 
@@ -79,13 +121,6 @@ def setup():
     }
     return result_data
 
-    #except ValueError as e:
-    #    print(str(e))
-    #    return None
-    #except Exception as e:
-    #    print(f"Unhandled exception: {str(e)}")
-    #    return None
-
 def auto_click():
     config = load_config()
     if config and input("使用上次的設定? (y/n): ").strip().lower() == 'y':
@@ -98,7 +133,7 @@ def auto_click():
     if not data:
         return
     print("選擇保留")
-    input("確認十倍育成按鈕可見後輸入任何按鍵: ")
+    input("確認育成按鈕可見後輸入任何按鍵: ")
     try:
         for i in range(int(data['target_cycles'])):
             time.sleep(1)
@@ -107,7 +142,9 @@ def auto_click():
 
             x, y = data['resultarrow_location']['x'], data['resultarrow_location']['y']
             color = data['result_color']
-            time.sleep(2)
+            time.sleep(1)
+            while locate_center_on_screen('resources/keep_current.png') is None:
+                time.sleep(1)
             if pyautogui.pixelMatchesColor(x, y, tuple(color)):
                 click_pixel('resources/keep_current.png')
             else:
