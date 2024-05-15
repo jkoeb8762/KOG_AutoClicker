@@ -2,3 +2,4 @@
 build/
 dist/
 KOG_AutoClick.spec
+.gitignore
