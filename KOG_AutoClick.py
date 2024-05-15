@@ -4,7 +4,6 @@ import json
 import time
 import os
 import re
-import pyscreeze
 
 # Global confidence level for image recognition
 CONFIDENCE = 0.8
