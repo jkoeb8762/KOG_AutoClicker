@@ -57,5 +57,3 @@ function verifyProductKey(productKey, hardwareID) {
   
 // Example usage:
 console.log(verifyProductKey("ABCD-1234-EFGH-5678", "HardwareIDFromPythonScript"));
-
-  
