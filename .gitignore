@@ -3,3 +3,6 @@ build/
 dist/
 KOG_AutoClick.spec
 .gitignore
+playground-1.mongodb.js
+testing.ipynb
+Authenticator.py
